@@ -88,6 +88,26 @@ func createLoggerFromFullConfig(config *configForParsing) (LoggerInterface, erro
 		}
 
 		return logger, nil
+	} else if config.LogType == asyncTimerAggloggerTypeFromString {
+		logData := config.LoggerData
+		if logData == nil {
+			return nil, errors.New("async timer data not set")
+		}
+
+		asyncInt, ok := logData.(asyncTimerLoggerData)
+		if !ok {
+			return nil, errors.New("invalid async timer data")
+		}
+		agg := new(aggression)
+		agg.index = config.aggressionData["index"].(string)
+		agg.keys = config.aggressionData["keys"].(map[string]string)
+
+		logger, err := NewAsyncTimerLoggerAgg(&config.logConfig, time.Duration(asyncInt.AsyncInterval), agg)
+		if !ok {
+			return nil, err
+		}
+
+		return logger, nil
 	} else if config.LogType == adaptiveLoggerTypeFromString {
 		logData := config.LoggerData
 		if logData == nil {

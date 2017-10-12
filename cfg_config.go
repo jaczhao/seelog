@@ -122,7 +122,7 @@ func LoggerFromWriterWithMinLevelAndFormat(output io.Writer, minLevel LogLevel, 
 		return nil, err
 	}
 
-	conf, err := newFullLoggerConfig(constraints, make([]*LogLevelException, 0), dispatcher, syncloggerTypeFromString, nil, nil)
+	conf, err := newFullLoggerConfig(constraints, make([]*LogLevelException, 0), dispatcher, syncloggerTypeFromString, nil,nil ,nil)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func LoggerFromCustomReceiver(receiver CustomReceiver) (LoggerInterface, error) 
 		return nil, err
 	}
 
-	conf, err := newFullLoggerConfig(constraints, make([]*LogLevelException, 0), dispatcher, syncloggerTypeFromString, nil, nil)
+	conf, err := newFullLoggerConfig(constraints, make([]*LogLevelException, 0), dispatcher, syncloggerTypeFromString, nil,nil,nil)
 	if err != nil {
 		return nil, err
 	}

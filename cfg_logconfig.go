@@ -34,6 +34,7 @@ const (
 	syncloggerTypeFromString = iota
 	asyncLooploggerTypeFromString
 	asyncTimerloggerTypeFromString
+	asyncTimerAggloggerTypeFromString
 	adaptiveLoggerTypeFromString
 	defaultloggerTypeFromString = asyncLooploggerTypeFromString
 )
@@ -42,6 +43,7 @@ const (
 	syncloggerTypeFromStringStr       = "sync"
 	asyncloggerTypeFromStringStr      = "asyncloop"
 	asyncTimerloggerTypeFromStringStr = "asynctimer"
+	asyncTimerAggloggerTypeFromStringStr = "asynctimeragg"
 	adaptiveLoggerTypeFromStringStr   = "adaptive"
 )
 
@@ -61,6 +63,7 @@ var loggerTypeToStringRepresentations = map[loggerTypeFromString]string{
 	syncloggerTypeFromString:       syncloggerTypeFromStringStr,
 	asyncLooploggerTypeFromString:  asyncloggerTypeFromStringStr,
 	asyncTimerloggerTypeFromString: asyncTimerloggerTypeFromStringStr,
+	asyncTimerAggloggerTypeFromString: asyncTimerAggloggerTypeFromStringStr,
 	adaptiveLoggerTypeFromString:   adaptiveLoggerTypeFromStringStr,
 }
 
@@ -94,6 +97,7 @@ type configForParsing struct {
 	logConfig
 	LogType    loggerTypeFromString
 	LoggerData interface{}
+	aggressionData map[string]interface{}
 	Params     *CfgParseParams // Check cfg_parser: CfgParseParams
 }
 
@@ -103,6 +107,7 @@ func newFullLoggerConfig(
 	rootDispatcher dispatcherInterface,
 	logType loggerTypeFromString,
 	logData interface{},
+	aggression map[string]interface{},
 	cfgParams *CfgParseParams) (*configForParsing, error) {
 	if constraints == nil {
 		return nil, errors.New("constraints can not be nil")
@@ -118,6 +123,7 @@ func newFullLoggerConfig(
 	config.LogType = logType
 	config.LoggerData = logData
 	config.Params = cfgParams
+	config.aggressionData = aggression
 
 	return config, nil
 }

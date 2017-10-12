@@ -39,6 +39,10 @@ import (
 const (
 	seelogConfigID                   = "seelog"
 	outputsID                        = "outputs"
+	aggressionID                     = "aggression"
+	indexID                          = "index"
+	fieldsID                         = "fields"
+	fieldID                          = "field"
 	formatsID                        = "formats"
 	minLevelID                       = "minlevel"
 	maxLevelID                       = "maxlevel"
@@ -257,7 +261,9 @@ func configFromXMLNodeWithConfig(config *xmlNode, cfg *CfgParseParams) (*configF
 		return nil, err
 	}
 
-	err = checkExpectedElements(config, optionalElement(outputsID), optionalElement(formatsID), optionalElement(exceptionsID))
+	err = checkExpectedElements(config, optionalElement(outputsID), optionalElement(formatsID),
+		optionalElement(exceptionsID), optionalElement(fieldsID), optionalElement(fieldID),
+		optionalElement(aggressionID), optionalElement(indexID))
 	if err != nil {
 		return nil, err
 	}
@@ -292,12 +298,14 @@ func configFromXMLNodeWithConfig(config *xmlNode, cfg *CfgParseParams) (*configF
 		return nil, err
 	}
 
+	aggression, err := getAggressionData(config)
+
 	loggerType, logData, err := getloggerTypeFromStringData(config)
 	if err != nil {
 		return nil, err
 	}
 
-	return newFullLoggerConfig(constraints, exceptions, dispatcher, loggerType, logData, cfg)
+	return newFullLoggerConfig(constraints, exceptions, dispatcher, loggerType, logData, aggression, cfg)
 }
 
 func getConstraints(node *xmlNode) (logLevelConstraints, error) {
@@ -509,7 +517,8 @@ func getloggerTypeFromStringData(config *xmlNode) (logType loggerTypeFromString,
 		return 0, nil, fmt.Errorf("unknown logger type: %s", logTypeStr)
 	}
 
-	if logType == asyncTimerloggerTypeFromString {
+	if logType == asyncTimerloggerTypeFromString ||
+		logType == asyncTimerAggloggerTypeFromString {
 		intervalStr, intervalExists := config.attributes[asyncLoggerIntervalAttr]
 		if !intervalExists {
 			return 0, nil, newMissingArgumentError(config.name, asyncLoggerIntervalAttr)
@@ -595,6 +604,34 @@ func getOutputsTree(config *xmlNode, formats map[string]*formatter, cfg *CfgPars
 		return nil, err
 	}
 	return NewSplitDispatcher(DefaultFormatter, []interface{}{console})
+}
+
+func getAggressionData(config *xmlNode) (map[string]interface{},  error) {
+	var result map[string]interface{}
+
+	var outputsNode *xmlNode
+	for _, child := range config.children {
+		if child.name == aggressionID {
+			outputsNode = child
+			break
+		}
+	}
+	if outputsNode == nil {
+		return nil, nil
+	}
+	keys := make(map[string]string)
+	var index string
+	for _, child := range outputsNode.children {
+		if child.name == indexID {
+			index = child.value
+		} else {
+			keys[child.value] = child.attributes["type"]
+		}
+	}
+	result = make(map[string]interface{})
+	result["index"] = index
+	result["keys"] = keys
+	return result, nil
 }
 
 func getCurrentFormat(node *xmlNode, formatFromParent *formatter, formats map[string]*formatter) (*formatter, error) {

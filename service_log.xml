@@ -1,0 +1,32 @@
+<seelog type="asynctimeragg" asyncinterval="1000000000" minlevel="info">
+    <outputs formatid="main">
+        <rollingfile formatid="main" type="size" filename="/lambda/api_server/log/service_metrics.log" maxsize="838860800" maxrolls="2" />
+    </outputs>
+    <aggression>
+        <index>functionName</index>
+        <field type="float64">latency</field>
+        <field type="float64">eaLatency</field>
+        <field type="float64">scheduleLatency</field>
+        <field type="float64">metaLatency</field>
+        <field type="float64">idleLatency</field>
+        <field type="string">functionName</field>
+        <field type="string">accountID</field>
+        <field type="string">clusterName</field>
+        <field type="string">ip</field>
+        <field type="string">method</field>
+        <field type="string">mode</field>
+        <field type="string">module</field>
+        <field type="string">operation</field>
+        <field type="string">path</field>
+        <field type="string">region</field>
+        <field type="string">requestID</field>
+        <field type="string">runtime</field>
+        <field type="string">serviceName</field>
+        <field type="string">startTime</field>
+        <field type="string">status</field>
+        <field type="string">userAgent</field>
+    </aggression>
+    <formats>
+        <format id="main" format="%Msg%n"/>
+    </formats>
+</seelog>
